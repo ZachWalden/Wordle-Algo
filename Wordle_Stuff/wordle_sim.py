@@ -3,7 +3,7 @@ def check_word(guess_word, word):
     #word = (open('Program\Wordle_Stuff\word.txt','r').read())
 
     guess_word = guess_word.upper()
-
+    word = word.upper()
     color_word = ["GR"]*5
  
     repeats = {}

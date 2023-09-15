@@ -8,7 +8,7 @@ guess = [['a', 'd', 'i', 'e', 'u'],[0,0,0,0,0]]                #guess word in [0
 #list of all vowels & consonants possible
 vowels = ['a', 'e', 'i', 'o', 'u']
 consonants = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z']
-yellow_letters = [[],[]] #[0] = letter    ;   [1] = known incorrect location
+yellow_letters = {} #key = letter, value = [#,#,#,#,#] of boolean know incorrect location
 remaining_guesses = 6
 green_letters = []
 
@@ -33,37 +33,46 @@ while (remaining_guesses > 0):
     if(check_result == ['G','G','G','G','G']):
         print("Answer:", ''.join(guess[0]))
         break
+    print("Word Guess Result: ", check_result)
 
     #update letters with their corresponding value
     for index, i in enumerate(check_result): 
         if i == 'G':
-            guess[1][index] = 2
-            green_letters.append(index)     #note that a letter is green
+            guess[1][index] = 2 #update in guessed word
+            green_letters.append(guess[0][index])     #note that a letter is green
         elif i == 'Y':
-            yellow_letters.append(guess[0][index])  #append letter to search for
-            guess[1][index] = 1
+            if not yellow_letters.get(i):   #if first time finding yellow
+                templist = [False,False,False,False,False]
+                templist[index] = True
+                yellow_letters.update({guess[0][index] : templist})  #append letter to search for
+            else:
+                templist = yellow_letters.get(guess[0][index])
+                templist[index] = True
+                yellow_letters.update({guess[0][index] : templist})
+            guess[1][index] = 1 #update in guessed word
         else:                                       #remove unappeared letters from searchable
             if guess[0][index] in vowels:
                 vowels.remove(guess[0][index])
-                break
-            print(index)
+                continue
             if guess[0][index] in consonants:
                 consonants.remove(guess[0][index])
-    print(guess[1]) #print result from removed letters
+            guess[1][index] = 0 #update in guessed word
+    print("Word Grade: ", guess[1]) #print result from assigned letters
 
-    guess_valid_letters_total = len(green_letters) + len(yellow_letters[0])
     """"""
     #no yellow nor green:
-    #if ((len(yellow_letters) == 0) and not green_letters):      
+    #if ((len(yellow_letters) == 0) and len(green_letters) == 0):  
     for i in guessable_words:
-
-        for j in range(5):    
-            if i[j] in vowels or j in consonants:
+        guess_valid_letters_total = 0
+        yellows_needed = len(yellow_letters)
+        for j in range(5):    #iterate thru word
+            if i[j] in vowels or i[j] in consonants:    #if is a remaining letter
+                if guess[1][j] == 2 and guess[0][j] != i[j]:  #if letter is green & matches
+                    break
                 guess_valid_letters_total += 1
-        if guess_valid_letters_total == 5:
+        if guess_valid_letters_total == 5:  #if 5 possible letters, guess
             guess[0] = list(i)
             break
-        guess_valid_letters_total = len(green_letters) + len(yellow_letters[0])
             
     """        
     #yellow, no green:
@@ -81,8 +90,8 @@ while (remaining_guesses > 0):
     #otherwise, green & yellow
     else:                                                       
         pass"""
-    print(guess)
+    print("\nGuess:", guess[0])
+    print("Consonants:", consonants)
+    print("Vowels: ", vowels)
     remaining_guesses -= 1      #subtract a guess at end of current ieration        
-
 print(consonants, vowels)
-                
